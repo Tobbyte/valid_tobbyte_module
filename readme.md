@@ -49,11 +49,15 @@ result = get_inp("Input: ")
 print(result, type(result))
 ```
 
-- User enters `1` -> `result` is `1` (as `int`).
-- User enters `a` -> `result` is `"a"` (as `str`).
-- Invalid input -> re-prompts, showing the accepted values.
-- `Enter` pressed twice in a row (with nothing else entered in
-  between) -> aborts, return value is `None`.
+```
+  >>> Input: [3]
+  ... Accepted inputs: {1, 2, "a"}
+  >>> Input: [""]
+  ... Accepted inputs: {1, 2, "a"}
+  ... Press Enter again to exit.
+  >>> Input: [1]
+  ... 1[: int]
+```
 
 ## API
 
