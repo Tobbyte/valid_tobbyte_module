@@ -85,3 +85,7 @@ decorator.
 - At one point (`def wrapper(prompt: str) -> Any | None:`), type checking is
   intentionally suppressed via `noqa: ANN401`, since dynamic
   casting via `type(x)(y)` can't be cleanly statically typed.
+
+
+  ## Acknowledgement
+  - Made with ❤️ and without ai or code completion (except intelliSense) (except this readme)
