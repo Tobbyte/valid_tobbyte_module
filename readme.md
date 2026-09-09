@@ -91,5 +91,9 @@ decorator.
   casting via `type(x)(y)` can't be cleanly statically typed.
 
 
-  ## Acknowledgement
-  - Made with ❤️ and without ai or code completion (except intelliSense) (except this readme)
+## Acknowledgement
+- Made with ❤️ and without ai or code completion (except intelliSense) (except this readme)
+
+
+## License
+This project is licensed under the MIT License.
