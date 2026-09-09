@@ -74,10 +74,11 @@ def validate(
     return deco
 
 
-@validate({1, 2, "a"})
-def _get_inp(prompt: str) -> str:
-    return input(prompt)
+if __name__ == "__main__":
 
+    @validate({1, 2, "a"})
+    def _get_inp(prompt: str) -> str:
+        return input(prompt)
 
-inp = _get_inp("do inp: ")
-print(inp, type(inp))
+    inp = _get_inp("do inp: ")
+    print(inp, type(inp))
