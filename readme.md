@@ -8,28 +8,17 @@ is effectively constrained to input()
 — but I'd just learned decorators and had fun with it :)_
 
 `@validate` wraps a prompt-based input function and keeps re-prompting
-until a value from an allowed set (`valid_inputs`) is provided. The input
+until a value matching an allowed list (`valid_inputs`) is provided. The input
 is automatically converted to the matching type.
-
-  TODO:
-    Add:
-    - first matching type returned
-    - new Datatype TypeLengthConstraint parameter
-    - TypeLengthConstraint data_type==float:
-        - '.' removed when
-        - max_length counts all digits
-    - mention strip_whitespaces param
 
 ## Features
 
-- **Automatic type casting**: The target type is inferred from the
-  elements of `valid_inputs` (e.g. `int`, `str`, ...).
-- **Repeated prompting**: On invalid input, the user is asked again,
-  along with a display of the accepted values.
-- **Clean exit**: Pressing `Enter` twice in a row (empty input) aborts
-  and returns `None`.
-- **Typed**: Uses `Any` for the return type, since the concrete type
-  depends on runtime data (the elements of `valid_inputs`).
+- **Automatic type casting**: Values are cast based on items in `valid_inputs`.
+- **First-match order**: Inputs are checked against `valid_inputs` sequentially; the first matching rule wins.
+- **Length constraints**: Supports `TypeLengthConstraint` for checking the length of typed entries (e.g. exactly 4 digits). Special character handling applies to `float` entries where `.`, `-`, and `+` are omitted from the length count.
+- **Whitespace control**: Leading and trailing whitespaces are trimmed by default (`strip_whitespaces=True`), with an option to preserve raw input.
+- **Repeated prompting**: On invalid input, the user is prompted again alongside a display of accepted inputs.
+- **Clean exit**: Pressing `Enter` twice in a row (empty input) aborts and returns `None`.
 
 ## Installation
 
@@ -37,76 +26,63 @@ No standalone PyPI package — install directly from the Git repo.
 
 In `requirements.txt`:
 
-```
 git+https://github.com/Tobbyte/valid_tobbyte_module.git@main#egg=valid_tobbyte_module
-```
 
 Then install locally:
 
-```bash
 pip install -r requirements.txt
-```
 
 ## Usage
 
-```python
-from valid_tobbyte_module import validate
+from valid_tobbyte_module import TypeLengthConstraint, validate
 
 
-@validate({1, 2, "a"})
+@validate([1, 2, "a", TypeLengthConstraint(max_length=4, data_type=float)])
 def get_inp(prompt: str) -> str:
     return input(prompt)
 
 
 result = get_inp("Input: ")
 print(result, type(result))
-```
 
-```
+Example interaction:
+
   >>> Input: [3]
-  ... Accepted inputs: {1, 2, "a"}
-  >>> Input: [""]
-  ... Accepted inputs: {1, 2, "a"}
-  ... Press Enter again to exit.
-  >>> Input: [1]
-  ... 1[: int]
-```
+  ... Accepted inputs: 1, 2, a, float (4)
+  >>> Input: [12.34]
+  ... 12.34 <class 'float'>
 
 ## API
 
-### `validate(valid_inputs: set[Any]) -> Callable[[Callable[..., str]], Callable[..., Any | None]]`
+### `validate(valid_inputs: list[Any], *, strip_whitespaces: bool = True) -> Callable[[Callable[..., str]], Callable[..., Any | None]]`
 
-Decorator factory. Takes a set of allowed values and returns the actual
-decorator.
+Decorator factory. Takes a list of allowed validators and returns the decorator.
 
 **Args:**
-- `valid_inputs` (`set[Any]`): Set of allowed values of arbitrary type,
-  e.g. `{1, 2, "a"}`. Each element's type must be constructible from a
-  single `str` argument (i.e. `type(element)(some_str)` must work), since
-  the raw user input is cast via `type(element)(raw_input)`.
+- `valid_inputs` (`list[Any]`): List containing any combination of:
+  - **Concrete values** (e.g., `1`, `"a"`): Matches exact values after casting.
+  - **Bare types** (e.g., `int`, `float`, `str`): Acts as a wildcard matching any input castable to that type.
+  - **`TypeLengthConstraint` objects**: Matches inputs of a specific castable type and length.
+- `strip_whitespaces` (`bool`): Whether to trim leading/trailing whitespace prior to validation. Defaults to `True`.
 
 **Returns:**
-- A decorator that wraps a prompt-based input function
-  (`Callable[..., str]`) and returns a function that yields `Any | None`.
+- A decorator wrapping a prompt function (`Callable[..., str]`) returning `Any | None`.
 
-## Design Notes
+---
 
-- The decorator is deliberately scoped to interactive, prompt-based input
-  sources (`input()`-like), since it blockingly re-calls the wrapped
-  function on invalid input. This retry behavior isn't suitable for other
-  sources (API calls, GUI fields, etc.).
-- Every element in `valid_inputs` must belong to a type that can be
-  constructed from a single `str` argument (e.g. `int`, `str`, `float`).
-  Types without such a constructor (or with an incompatible one) will
-  simply never match, since the cast attempt raises and is caught.
-- At one point (`def wrapper(prompt: str) -> Any | None:`), type checking is
-  intentionally suppressed via `noqa: ANN401`, since dynamic
-  casting via `type(x)(y)` can't be cleanly statically typed.
+### `TypeLengthConstraint(max_length: int, data_type: type = int)`
 
+Dataclass for constraining input length by type.
 
-## Acknowledgement
-- Made with ❤️ and without ai or code completion (except intelliSense) (except this readme)
+- `max_length` (`int`): Required length of the input.
+- `data_type` (`type`): Target data type to cast to (defaults to `int`).
+- **Float handling**: If `data_type=float`, structural characters (`.`, `-`, `+`) are ignored during length counting so only actual digits are evaluated.
 
+## Matching Considerations
+
+- **Evaluation Order**: `valid_inputs` is evaluated strictly sequentially. Placing a broad wildcard like `str` first will consume all inputs before other constraints can be checked.
+- **Don't get freaky**: Strings like `"10e3"` evaluate as `10000.0` when cast to `float` and count as 4 characters when non-digit characters are stripped.
 
 ## License
+
 This project is licensed under the MIT License.
