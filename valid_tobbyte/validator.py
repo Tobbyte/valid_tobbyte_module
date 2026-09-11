@@ -32,6 +32,8 @@ def _pretty_wrong_input(valid_inputs: list, custom_msg: str = "") -> None:
 
     Or print a custom message if provided.
     """
+    if custom_msg:
+        print(custom_msg)
 
     def get_by_type(validator: Any) -> str:  # noqa: ANN401
         """Get a string representation of a validator by its type."""
@@ -41,15 +43,11 @@ def _pretty_wrong_input(valid_inputs: list, custom_msg: str = "") -> None:
             return f"{validator.data_type.__name__} ({validator.max_length})"
         return str(validator)
 
-    if custom_msg:
-        print(custom_msg)
+    # TODO: make more user friendly:
+    # 'decimal number' instead of just 'float', etc.
+    pretty_valids = ", ".join(get_by_type(valid) for valid in valid_inputs)
 
-    else:
-        # TODO: make more user friendly:
-        # 'decimal number' instead of just 'float', etc.
-        pretty_valids = ", ".join(get_by_type(valid) for valid in valid_inputs)
-
-        print(f"Accepted inputs: {pretty_valids}")
+    print(f"Accepted inputs: {pretty_valids}")
 
 
 def validate(
