@@ -115,12 +115,6 @@ def validate(
         >>> 23.2 [<class 'str'>]
 
     """
-    # Pre-extract concrete scalar values
-    concrete_types = {
-        type(val)
-        for val in valid_inputs
-        if not isinstance(val, type | TypeLengthConstraint)
-    }
 
     def deco(func: Callable[..., str]) -> Callable[..., Any | None]:
         @wraps(func)
@@ -136,15 +130,15 @@ def validate(
                     return None
                 insist_to_quit = False  # reset
 
-                # 1. Try matching wildcard types and constraints
                 for valid_inp in valid_inputs:
                     if isinstance(valid_inp, type):
+                        # 1. Try matching wildcard types and constraints
                         try:
                             return valid_inp(raw_user_input)
                         except (ValueError, TypeError):
                             continue
-
                     elif isinstance(valid_inp, TypeLengthConstraint):
+                        # 2. Match concrete TypeLengthConstraint
                         try:
                             typed_user_inp = valid_inp.data_type(
                                 raw_user_input,
@@ -157,9 +151,9 @@ def validate(
                             == valid_inp.max_length
                         ):
                             return typed_user_inp
-
-                    # 2. Try matching concrete values (e.g. 1, "a", 3.14)
-                    for val_type in concrete_types:
+                    else:
+                        # 3. Match concrete values (e.g. 1, "a", 3.14)
+                        val_type = type(valid_inp)
                         try:
                             typed_user_inp = val_type(raw_user_input)
                             if typed_user_inp in valid_inputs:
