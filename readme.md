@@ -3,6 +3,10 @@
 A Python decorator just for kicks for validating and type-casting
 interactive user input (`input()`).
 
+> _I'm aware that a plain function would make more sense here, given that this
+is effectively constrained to input()
+— but I'd just learned decorators and had fun with it :)_
+
 `@validate` wraps a prompt-based input function and keeps re-prompting
 until a value from an allowed set (`valid_inputs`) is provided. The input
 is automatically converted to the matching type.
