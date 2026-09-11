@@ -26,14 +26,19 @@ No standalone PyPI package — install directly from the Git repo.
 
 In `requirements.txt`:
 
+```
 git+https://github.com/Tobbyte/valid_tobbyte_module.git@main#egg=valid_tobbyte_module
+```
 
 Then install locally:
 
+```bash
 pip install -r requirements.txt
+```
 
 ## Usage
 
+```python
 from valid_tobbyte_module import TypeLengthConstraint, validate
 
 
@@ -46,11 +51,11 @@ result = get_inp("Input: ")
 print(result, type(result))
 
 Example interaction:
-
   >>> Input: [3]
   ... Accepted inputs: 1, 2, a, float (4)
   >>> Input: [12.34]
   ... 12.34 <class 'float'>
+```
 
 ## API
 
@@ -82,6 +87,11 @@ Dataclass for constraining input length by type.
 
 - **Evaluation Order**: `valid_inputs` is evaluated strictly sequentially. Placing a broad wildcard like `str` first will consume all inputs before other constraints can be checked.
 - **Don't get freaky**: Strings like `"10e3"` evaluate as `10000.0` when cast to `float` and count as 4 characters when non-digit characters are stripped.
+
+
+## Acknowledgement
+- Made with ❤️ and without ai or code completion (except this readme)
+
 
 ## License
 
