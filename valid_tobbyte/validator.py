@@ -14,6 +14,44 @@ class TypeLengthConstraint:
     data_type: type = int
 
 
+def _count_length(raw: str, data_type: type) -> int:
+    """Count length of raw input based on data_type."""
+    if data_type is float:
+        return len(_strip_symbols(raw))
+    return len(raw)
+
+
+def _strip_symbols(raw_user_input: str) -> str:
+    """Remove symbols from user input to count digits for floats."""
+    replacements = str.maketrans({".": "", "-": "", "+": ""})
+    return raw_user_input.translate(replacements)
+
+
+def _pretty_wrong_input(valid_inputs: list, custom_msg: str = "") -> None:
+    """Pretty print allowed inputs when user input is invalid.
+
+    Or print a custom message if provided.
+    """
+
+    def get_by_type(validator: Any) -> str:  # noqa: ANN401
+        """Get a string representation of a validator by its type."""
+        if isinstance(validator, type):
+            return validator.__name__
+        if isinstance(validator, TypeLengthConstraint):
+            return f"{validator.data_type.__name__} ({validator.max_length})"
+        return str(validator)
+
+    if custom_msg:
+        print(custom_msg)
+
+    else:
+        # TODO: make more user friendly:
+        # 'decimal number' instead of just 'float', etc.
+        pretty_valids = ", ".join(get_by_type(valid) for valid in valid_inputs)
+
+        print(f"Accepted inputs: {pretty_valids}")
+
+
 def validate(
     valid_inputs: list[Any],
     *,
@@ -107,7 +145,7 @@ def validate(
                         except (ValueError, TypeError):
                             continue
                         if (
-                            count_length(raw_user_input, valid_inp.data_type)
+                            _count_length(raw_user_input, valid_inp.data_type)
                             == valid_inp.max_length
                         ):
                             return typed_user_inp
@@ -122,7 +160,7 @@ def validate(
                             return typed_user_inp
                         continue
 
-                pretty_wrong_input(valid_inputs)
+                _pretty_wrong_input(valid_inputs)
 
                 if not raw_user_input:
                     print("Press Enter again to exit.")
@@ -133,46 +171,6 @@ def validate(
     return deco
 
 
-def count_length(raw: str, data_type: type) -> int:
-    """Count length of raw input based on data_type."""
-    if data_type is float:
-        return len(strip_symbols(raw))
-    return len(raw)
-
-
-def strip_symbols(raw_user_input: str) -> str:
-    """Remove symbols from user input.
-
-    Used when input is TypeLengthConstraint with data_type==float,
-    to count only digits.
-    """
-    replacements = str.maketrans({".": "", "-": "", "+": ""})
-    return raw_user_input.translate(replacements)
-
-
-def pretty_wrong_input(valid_inputs: list, custom_msg: str = "") -> None:
-    """Pretty print allowed inputs when user input is invalid.
-
-    Or print a custom message if provided.
-    """
-
-    def get_by_type(validator: Any) -> str:  # noqa: ANN401
-        """Get a string representation of a validator by its type."""
-        if isinstance(validator, type):
-            return validator.__name__
-        if isinstance(validator, TypeLengthConstraint):
-            return f"{validator.data_type.__name__} ({validator.max_length})"
-        return str(validator)
-
-    if custom_msg:
-        print(custom_msg)
-
-    else:
-        # TODO: make more user friendly:
-        # 'decimal number' instead of just 'float', etc.
-        pretty_valids = ", ".join(get_by_type(valid) for valid in valid_inputs)
-
-        print(f"Accepted inputs: {pretty_valids}")
 
 
 if __name__ == "__main__":
