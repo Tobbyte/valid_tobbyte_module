@@ -11,6 +11,15 @@ is effectively constrained to input()
 until a value from an allowed set (`valid_inputs`) is provided. The input
 is automatically converted to the matching type.
 
+  TODO:
+    Add:
+    - first matching type returned
+    - new Datatype TypeLengthConstraint parameter
+    - TypeLengthConstraint data_type==float:
+        - '.' removed when
+        - max_length counts all digits
+    - mention strip_whitespaces param
+
 ## Features
 
 - **Automatic type casting**: The target type is inferred from the
