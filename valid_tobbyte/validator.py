@@ -128,14 +128,13 @@ def validate(
 
                 for valid_inp in valid_inputs:
                     type_of_val = type(valid_inp)
-
-                    if type_of_val is type:
+                    if isinstance(valid_inp, type):
                         try:
                             return valid_inp(raw_user_input)
                         except (ValueError, TypeError):
                             continue
 
-                    elif type_of_val is TypeLengthConstraint:
+                    elif isinstance(valid_inp, TypeLengthConstraint):
                         try:
                             typed_user_inp = valid_inp.data_type(
                                 raw_user_input,
