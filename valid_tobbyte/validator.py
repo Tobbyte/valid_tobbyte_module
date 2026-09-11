@@ -73,11 +73,15 @@ def validate(
             `-`, and `+` are excluded from the length count, so only
             actual digits are counted.
 
+    Consider:
     Matching order: `valid_inputs` is processed in its order. The first
     matching entry wins and is returned immediately. A 'str' wildcard as
     first element will match any input. Your responsibility.
     Using multiple `TypeLengthConstraint` (or multiple wildcard types)
     whose accepted inputs overlap is strongly discouraged.
+    Don't cry if you try to get funny:
+    10e3 will match against TypeLengthConstraint(4, float) and will
+    return 10000.0 <class 'float'>. Go figure.
 
     Whitespace: by default, leading/trailing whitespace is stripped
     from user input before validation (`strip_whitespaces=True`). Pass
@@ -130,10 +134,10 @@ def validate(
 
                 if not raw_user_input and insist_to_quit:
                     return None
-                insist_to_quit = False
+                insist_to_quit = False  # reset
 
+                # 1. Try matching wildcard types and constraints
                 for valid_inp in valid_inputs:
-                    type_of_val = type(valid_inp)
                     if isinstance(valid_inp, type):
                         try:
                             return valid_inp(raw_user_input)
@@ -147,6 +151,7 @@ def validate(
                             )
                         except (ValueError, TypeError):
                             continue
+
                         if (
                             _count_length(raw_user_input, valid_inp.data_type)
                             == valid_inp.max_length
@@ -177,7 +182,7 @@ def validate(
 
 if __name__ == "__main__":
 
-    @validate(["a", 1])
+    @validate([1, 2, "a", TypeLengthConstraint(4, float)])
     def _get_inp(prompt: str) -> str:
         return input(prompt)
 
