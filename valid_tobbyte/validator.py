@@ -134,12 +134,15 @@ def validate(
                     if isinstance(valid_inp, type):
                         # 1. Try matching wildcard types and constraints
                         try:
+                            if valid_inp is float:
+                                raw_user_input.index(".")
                             return valid_inp(raw_user_input)
                         except (ValueError, TypeError):
                             continue
                     elif isinstance(valid_inp, TypeLengthConstraint):
                         # 2. Match concrete TypeLengthConstraint
                         try:
+                            raw_user_input.index(".")
                             typed_user_inp = valid_inp.data_type(
                                 raw_user_input,
                             )
