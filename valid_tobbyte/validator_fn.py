@@ -51,6 +51,7 @@ def _pretty_wrong_input(valid_inputs: list, custom_msg: str = "") -> None:
 def validate_fn(
     valid_inputs: list[Any],
     prompt: str,
+    exit_promt: str = "Press Enter again to exit.",
     *,
     strip_whitespaces: bool = True,
 ) -> Any | None:  # noqa: ANN401
@@ -162,7 +163,7 @@ def validate_fn(
         _pretty_wrong_input(valid_inputs)
 
         if not raw_user_input:
-            print("Press Enter again to exit.")
+            print(exit_promt)
             insist_to_quit = True
 
 
